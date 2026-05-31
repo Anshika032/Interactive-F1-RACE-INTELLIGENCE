@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 import sys
 
 import joblib
@@ -24,7 +24,7 @@ DRIVER_ALIASES = {
     "norris":        "Lando Norris",
     "sainz":         "Carlos Sainz",
     "russell":       "George Russell",
-    "perez":         "Sergio Pérez",
+    "perez":         "Sergio PÃ©rez",
     "alonso":        "Fernando Alonso",
     "piastri":       "Oscar Piastri",
     "stroll":        "Lance Stroll",
@@ -40,7 +40,7 @@ DRIVER_ALIASES = {
     "gasly":         "Pierre Gasly",
     "ocon":          "Esteban Ocon",
     "albon":         "Alexander Albon",
-    "hulkenberg":    "Nico Hülkenberg",
+    "hulkenberg":    "Nico HÃ¼lkenberg",
     "lawson":        "Liam Lawson",
     "colapinto":     "Franco Colapinto",
 }
@@ -61,12 +61,12 @@ CHAMPIONSHIP_POINTS_2025 = {
     "Liam Lawson":          16,
     "Carlos Sainz":         14,
     "Gabriel Bortoleto":    10,
-    "Nico Hülkenberg":       8,
+    "Nico HÃ¼lkenberg":       8,
     "Alexander Albon":       6,
     "Esteban Ocon":          4,
     "Fernando Alonso":       2,
     "Lance Stroll":          0,
-    "Sergio Pérez":          0,
+    "Sergio PÃ©rez":          0,
     "Valtteri Bottas":       0,
     "Arvid Lindblad":        0,
 }
@@ -92,7 +92,7 @@ CIRCUIT_RAIN_PROB = {
     "Singapore Grand Prix":      0.40,
     "United States Grand Prix":  0.25,
     "Mexico City Grand Prix":    0.20,
-    "São Paulo Grand Prix":      0.45,
+    "SÃ£o Paulo Grand Prix":      0.45,
     "Las Vegas Grand Prix":      0.05,
     "Qatar Grand Prix":          0.05,
     "Abu Dhabi Grand Prix":      0.05,
@@ -117,7 +117,7 @@ CIRCUIT_COORDS = {
     "Singapore Grand Prix":      (1.2914, 103.8640),
     "United States Grand Prix":  (30.1328, -97.6411),
     "Mexico City Grand Prix":    (19.4042, -99.0907),
-    "São Paulo Grand Prix":      (-23.7036, -46.6997),
+    "SÃ£o Paulo Grand Prix":      (-23.7036, -46.6997),
     "Las Vegas Grand Prix":      (36.1147, -115.1728),
     "Qatar Grand Prix":          (25.4900, 51.4542),
     "Abu Dhabi Grand Prix":      (24.4672, 54.6031),
@@ -157,7 +157,7 @@ DRIVER_TEAM_2025 = {
     "Carlos Sainz":            "Williams",
     "Lewis Hamilton":          "Ferrari",
     "Andrea Kimi Antonelli":   "Mercedes",
-    "Sergio Pérez":            "Red Bull Racing",
+    "Sergio PÃ©rez":            "Red Bull Racing",
     "Yuki Tsunoda":            "Red Bull Racing",
     "Isack Hadjar":            "Racing Bulls",
     "Fernando Alonso":         "Aston Martin",
@@ -168,7 +168,7 @@ DRIVER_TEAM_2025 = {
     "Esteban Ocon":            "Haas F1 Team",
     "Alexander Albon":         "Williams",
     "Liam Lawson":             "Racing Bulls",
-    "Nico Hülkenberg":         "Sauber",
+    "Nico HÃ¼lkenberg":         "Sauber",
     "Gabriel Bortoleto":       "Sauber",
 }
 
@@ -179,8 +179,8 @@ def normalize_driver(name: str) -> str:
 
 DRIVER_MODEL_ALIASES = {
     "Kimi Antonelli": "Andrea Kimi Antonelli",
-    "Sergio Pérez": "Sergio Perez",
-    "Nico Hülkenberg": "Nico Hulkenberg",
+    "Sergio PÃ©rez": "Sergio Perez",
+    "Nico HÃ¼lkenberg": "Nico Hulkenberg",
 }
 
 
@@ -215,7 +215,7 @@ def get_driver_session_data(driver_name: str, track_name: str, year: int = 2026,
     try:
         driver_name = normalize_driver_for_model(driver_name)
 
-        # 2026 FastF1 uses short names — add fallback search names
+        # 2026 FastF1 uses short names â€” add fallback search names
         driver_search_names = [driver_name.strip().lower()]
         # Add short name variant
         parts = driver_name.strip().split()
@@ -244,9 +244,9 @@ def get_driver_session_data(driver_name: str, track_name: str, year: int = 2026,
             return None
 
         target_round = int(event.iloc[0]['RoundNumber'])
-        print(f"[INFO] Using {actual_year} Round {target_round} — {event.iloc[0]['EventName']}")
+        print(f"[INFO] Using {actual_year} Round {target_round} â€” {event.iloc[0]['EventName']}")
 
-        # ── QUALIFYING ────────────────────────────────────────────────
+        # â”€â”€ QUALIFYING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         quali_grid = 10
         quali_delta = 1.0
         real_team = "Unknown"
@@ -272,7 +272,7 @@ def get_driver_session_data(driver_name: str, track_name: str, year: int = 2026,
         except Exception as e:
             print(f"[WARN] Quali failed: {e}")
 
-        # ── RECENT FORM: last 5 races ─────────────────────────────────
+        # â”€â”€ RECENT FORM: last 5 races â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         driver_form = 0.5
         constructor_form = 0.5
         driver_dnf_rate = 0.05
@@ -345,7 +345,7 @@ def get_driver_session_data(driver_name: str, track_name: str, year: int = 2026,
 
         print(f"[FORM] driver_form={driver_form}, constructor_form={constructor_form}, dnf={driver_dnf_rate}")
 
-        # ── TRACK HISTORY ─────────────────────────────────────────────
+        # â”€â”€ TRACK HISTORY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         track_history = 0.5
         track_positions = []
         for past_year in [actual_year - 1, actual_year - 2, actual_year - 3]:
@@ -371,7 +371,7 @@ def get_driver_session_data(driver_name: str, track_name: str, year: int = 2026,
             avg_tr = sum(track_positions) / len(track_positions)
             track_history = round(max(0.1, min(1.0, 1 - (avg_tr - 1) / 19)), 3)
 
-        print(f"[TRACK HISTORY] {driver_name} at {track_name}: {track_positions} → {track_history}")
+        print(f"[TRACK HISTORY] {driver_name} at {track_name}: {track_positions} â†’ {track_history}")
 
         return {
             'grid':             quali_grid,
@@ -439,7 +439,7 @@ def safe_encode(encoder, value, fallback=0):
     try:
         return int(encoder.transform([value])[0])
     except Exception:
-        # Unknown label — find closest known label or return median
+        # Unknown label â€” find closest known label or return median
         try:
             classes = list(encoder.classes_)
             if classes:
@@ -582,7 +582,7 @@ def predict(request: PredictionRequest):
         real_driver_dnf       = request.DriverDNFRate
         real_cons_dnf         = request.ConstructorDNFRate
 
-    # ── Always resolve team + estimate grid for future races ───────────────
+    # â”€â”€ Always resolve team + estimate grid for future races â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if real_team in ("Unknown", "", None):
         real_team = get_driver_team(request.Driver, request.Constructor)
         print(f"[FIX] Team resolved to: {real_team}")
@@ -659,6 +659,20 @@ def predict(request: PredictionRequest):
         raise e
 
     predicted_position = round(float(prediction), 2)
+
+    # Grid position bias correction (empirically derived from residual analysis)
+    # Model systematically overpredicts position number for frontrunners
+    if real_grid == 1:
+        predicted_position = round(max(1.0, predicted_position - 0.944), 2)
+    elif real_grid <= 3:
+        predicted_position = round(max(1.0, predicted_position - 0.747), 2)
+    elif real_grid <= 6:
+        predicted_position = round(max(1.0, predicted_position - 0.632), 2)
+    elif real_grid <= 10:
+        predicted_position = round(max(1.0, predicted_position - 0.097), 2)
+    else:
+        predicted_position = round(min(20.0, predicted_position + 0.769), 2)
+
     pos = predicted_position
 
     # Position-based probabilities (realistic)
