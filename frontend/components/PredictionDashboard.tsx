@@ -161,7 +161,7 @@ function CanadaPostmortem() {
                 <div style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 10, color: teamColor, opacity: 0.7 }}>{row.team}</div>
               </div>
               <div style={{ textAlign: 'center', fontFamily: 'Orbitron, monospace', fontSize: 11, color: 'rgba(255,150,60,0.5)' }}>P{row.grid}</div>
-              <div style={{ textAlign: 'center', fontFamily: 'Orbitron, monospace', fontSize: 12, fontWeight: 700, color: '#FF8C00' }}>P{Math.round(row.predicted)}</div>
+              <div style={{ textAlign: 'center', fontFamily: 'Orbitron, monospace', fontSize: 12, fontWeight: 700, color: '#FF8C00' }}>P{row.predicted.toFixed(1)}</div>
               <div style={{ textAlign: 'center', fontFamily: 'Orbitron, monospace', fontSize: 12, fontWeight: 700, color: isDNF ? '#CC1100' : isGood ? '#00FF88' : '#FFD700' }}>
                 {isDNF ? '—' : `P${row.actual}`}
               </div>
