@@ -221,3 +221,8 @@ Primary error source: no circuit-specific car pace signal — Antonelli's Merced
 ## License
 
 MIT
+
+<img width="1875" height="939" alt="image" src="https://github.com/user-attachments/assets/657bf96f-250c-45bf-9954-c32283c05b45" />
+<img width="1832" height="908" alt="image" src="https://github.com/user-attachments/assets/be42f126-c3fc-4357-9c4d-ba09787e9f8f" />
+<img width="904" height="446" alt="image" src="https://github.com/user-attachments/assets/2407abe3-0e3d-4af0-b085-946768703583" />
+
