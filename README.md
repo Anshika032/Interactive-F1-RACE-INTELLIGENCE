@@ -1,6 +1,6 @@
-# PITWALL ??? Interactive F1 Race Intelligence
+# 🏎️ Race Oracle — Interactive F1 Race Intelligence
 
-> AI-powered Formula 1 pitwall decision-support and race prediction platform. Predicts finishing positions for all 20 drivers per Grand Prix using XGBoost trained on 5 seasons of real F1 data and provides live strategy signals.
+> AI-powered Formula 1 race prediction platform. Predicts finishing positions for all 20 drivers per Grand Prix using XGBoost trained on 5 seasons of real F1 data.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?logo=fastapi)](https://fastapi.tiangolo.com)
@@ -11,7 +11,7 @@
 
 ## Overview
 
-PITWALL is a full-stack motorsport intelligence platform that combines machine learning with real-time F1 data. It ingests FastF1 telemetry, computes composite driver strength features, and serves predictions and pitwall strategy signals via a FastAPI backend to a Next.js frontend with 3D visualization.
+Race Oracle is a full-stack motorsport intelligence platform that combines machine learning with real-time F1 data. It ingests FastF1 telemetry, computes composite driver strength features, and serves predictions via a FastAPI backend to a Next.js frontend with 3D visualization.
 
 **Core capabilities:**
 - Per-driver finishing position prediction for all 20 drivers before each race
@@ -42,7 +42,7 @@ PITWALL is a full-stack motorsport intelligence platform that combines machine l
 | Metric | Value |
 |--------|-------|
 | Algorithm | XGBoost Regressor |
-| Training data | 2022???2026 seasons |
+| Training data | 2022–2026 seasons |
 | Rows | 2,427 |
 | Cross-val MAE | 3.61 positions |
 | Ex-DNF MAE | 3.1 positions |
@@ -62,9 +62,9 @@ PITWALL is a full-stack motorsport intelligence platform that combines machine l
 Post-prediction correction applied in `backend/app/main.py` (~line 661) to offset systematic underestimation of front-row starters.
 
 ### Custom Encoder
-Model uses `AliasAwareLabelEncoder` to handle driver name variants (accents, aliases). Registered at load time ??? see `encoder_compat.py`.
+Model uses `AliasAwareLabelEncoder` to handle driver name variants (accents, aliases). Registered at load time — see `encoder_compat.py`.
 
-> ?????? Model `.pkl` files are excluded from git. Retrain locally before running the backend.
+> ⚠️ Model `.pkl` files are excluded from git. Retrain locally before running the backend.
 
 ---
 
@@ -119,9 +119,9 @@ model = joblib.load('models/xgboost_multiseason_reliability.pkl')
 encoders = joblib.load('models/multiseason_reliability_encoders.pkl')
 ```
 
-**Critical encoder strings** ??? must match exactly:
-- `"Sergio P??rez"` (accent required)
-- `"Nico H??lkenberg"` (umlaut required)
+**Critical encoder strings** — must match exactly:
+- `"Sergio Pérez"` (accent required)
+- `"Nico Hülkenberg"` (umlaut required)
 - `"Alpine F1 Team"`, `"Haas F1 Team"` (exact spacing)
 
 ---
@@ -129,35 +129,35 @@ encoders = joblib.load('models/multiseason_reliability_encoders.pkl')
 ## Project Structure
 
 ```
-????????? backend/
-???   ????????? app/
-???       ????????? main.py                   # FastAPI server + bias correction (~line 661)
-????????? frontend/
-???   ????????? components/
-???   ???   ????????? HeroSection.tsx           # GSAP animated hero
-???   ???   ????????? F1CarScene.tsx            # Three.js 3D car, multi-team livery rotation
-???   ???   ????????? RaceInfo.tsx              # Circuit SVG map + countdown + live weather
-???   ???   ????????? PredictionDashboard.tsx   # Prediction UI + postmortem table
-???   ???   ????????? PodiumScene.tsx           # 3D podium visualization
-???   ???   ????????? LiveBackground.tsx        # Particle background
-???   ????????? src/
-???   ???   ????????? data/
-???   ???       ????????? monaco-sectors.ts     # ?????? Generated ??? see Circuit Map section
-???   ????????? app/
-???       ????????? predict/page.tsx          # /predict route
-????????? src/
-???   ????????? training/
-???       ????????? retrain_2025.py           # Model retrain entrypoint
-????????? encoder_compat.py                 # AliasAwareLabelEncoder definition
-????????? residual_analysis.py              # Grid bucket residual diagnostics
-????????? models/                           # ?????? Not in git ??? retrain locally
+├── backend/
+│   └── app/
+│       └── main.py                   # FastAPI server + bias correction (~line 661)
+├── frontend/
+│   ├── components/
+│   │   ├── HeroSection.tsx           # GSAP animated hero
+│   │   ├── F1CarScene.tsx            # Three.js 3D car, multi-team livery rotation
+│   │   ├── RaceInfo.tsx              # Circuit SVG map + countdown + live weather
+│   │   ├── PredictionDashboard.tsx   # Prediction UI + postmortem table
+│   │   ├── PodiumScene.tsx           # 3D podium visualization
+│   │   └── LiveBackground.tsx        # Particle background
+│   ├── src/
+│   │   └── data/
+│   │       └── monaco-sectors.ts     # ⚠️ Generated — see Circuit Map section
+│   └── app/
+│       └── predict/page.tsx          # /predict route
+├── src/
+│   └── training/
+│       └── retrain_2025.py           # Model retrain entrypoint
+├── encoder_compat.py                 # AliasAwareLabelEncoder definition
+├── residual_analysis.py              # Grid bucket residual diagnostics
+└── models/                           # ⚠️ Not in git — retrain locally
 ```
 
 ---
 
 ## Circuit Map
 
-The Monaco circuit SVG (`RaceInfo.tsx`) uses real Iconscout geometry ??? 12,346 polylines processed into 3 sector path groups and committed as `frontend/src/data/monaco-sectors.ts`.
+The Monaco circuit SVG (`RaceInfo.tsx`) uses real Iconscout geometry — 12,346 polylines processed into 3 sector path groups and committed as `frontend/src/data/monaco-sectors.ts`.
 
 Sector coloring is spatial-zone-based (not lap-distance-based), so sector boundaries are approximate. The animated dot follows GPS-derived waypoints mapped to SVG coordinate space.
 
@@ -173,13 +173,13 @@ git add -f frontend/src/data/monaco-sectors.ts
 
 | Round | Race | Prediction Status |
 |-------|------|-------------------|
-| 1 | Australian GP | ??? Complete |
-| 2 | Chinese GP | ??? Complete |
-| 3 | Japanese GP | ??? Complete |
-| 4 | Miami GP | ??? Complete |
-| 5 | Canadian GP | ??? Complete ??? postmortem built |
-| 6 | Monaco GP | ??? Complete ??? June 7 |
-| 7 | Barcelona GP | ??? June 14 |
+| 1 | Australian GP | ✅ Complete |
+| 2 | Chinese GP | ✅ Complete |
+| 3 | Japanese GP | ✅ Complete |
+| 4 | Miami GP | ✅ Complete |
+| 5 | Canadian GP | ✅ Complete — postmortem built |
+| 6 | Monaco GP | ✅ Complete — June 7 |
+| 7 | Barcelona GP | ⏳ June 14 |
 
 ---
 
@@ -189,13 +189,13 @@ git add -f frontend/src/data/monaco-sectors.ts
 |--------|------|-----------|--------|-------|
 | Kimi Antonelli | P2 | P5.5 | P1 | 4.5 |
 | Lewis Hamilton | P5 | P5.0 | P2 | 3.0 |
-| Max Verstappen | P3 | P3.2 | P3 | ??? 0.2 |
+| Max Verstappen | P3 | P3.2 | P3 | ✅ 0.2 |
 | Charles Leclerc | P4 | P6.1 | P4 | 2.1 |
-| George Russell | P1 | P2.1 | DNF | ??? |
+| George Russell | P1 | P2.1 | DNF | — |
 
 **Race MAE:** 4.76 &nbsp;|&nbsp; **Ex-DNF MAE:** 3.1
 
-Primary error source: no circuit-specific car pace signal ??? Antonelli's Mercedes pace advantage at Canada was invisible to the model.
+Primary error source: no circuit-specific car pace signal — Antonelli's Mercedes pace advantage at Canada was invisible to the model.
 
 ---
 
@@ -203,7 +203,7 @@ Primary error source: no circuit-specific car pace signal ??? Antonelli's Merced
 
 - No circuit-specific constructor pace signal (dominant source of prediction error at tracks with aero-sensitive layouts)
 - Win/podium probabilities are estimated from predicted finishing position, not from a separate classification model
-- `DRIVER_PROFILES` grid positions in `PredictionDashboard.tsx` are hardcoded ??? must be updated manually after qualifying
+- `DRIVER_PROFILES` grid positions in `PredictionDashboard.tsx` are hardcoded — must be updated manually after qualifying
 - Sector coloring on circuit map is approximate (spatial zones, not lap-distance splits)
 
 ---
@@ -221,10 +221,3 @@ Primary error source: no circuit-specific car pace signal ??? Antonelli's Merced
 ## License
 
 MIT
-
-<img width="1875" height="939" alt="image" src="https://github.com/user-attachments/assets/657bf96f-250c-45bf-9954-c32283c05b45" />
-<img width="1832" height="908" alt="image" src="https://github.com/user-attachments/assets/be42f126-c3fc-4357-9c4d-ba09787e9f8f" />
-<img width="904" height="446" alt="image" src="https://github.com/user-attachments/assets/2407abe3-0e3d-4af0-b085-946768703583" />
-
-
-
