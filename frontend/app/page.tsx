@@ -42,14 +42,14 @@ export default function Home() {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         flexDirection: 'column', gap: 16,
       }}>
-        <div style={{
+          <div style={{
           fontFamily: 'Orbitron, monospace',
           fontSize: 'clamp(14px,3vw,28px)',
           fontWeight: 900, letterSpacing: 12,
           background: 'linear-gradient(135deg,#FF4500,#FF8C00,#FFD700)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
         }}>
-          RACE ORACLE
+          PITWALL
         </div>
         <div style={{ width: 120, height: 1, background: 'linear-gradient(90deg,transparent,#FF4500,transparent)' }} />
         <div style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 11, letterSpacing: 5, color: 'rgba(255,100,40,0.5)' }}>
@@ -75,7 +75,7 @@ export default function Home() {
             background: 'linear-gradient(90deg,#FF4500,#FF8C00)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             letterSpacing: 3,
-          }}>RACE ORACLE</div>
+          }}>PITWALL</div>
           <div style={{ display: 'flex', gap: 32 }}>
             {[
               { label: 'PREDICT', href: '#prediction' },
@@ -117,7 +117,7 @@ export default function Home() {
           padding: '24px 6vw',
           display: 'flex', justifyContent: 'space-between',
         }}>
-          <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 9, letterSpacing: 3, color: 'rgba(255,69,0,0.3)' }}>RACE ORACLE © 2025</div>
+          <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 9, letterSpacing: 3, color: 'rgba(255,69,0,0.3)' }}>PITWALL © 2025</div>
           <div style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 12, letterSpacing: 2, color: 'rgba(255,120,50,0.3)' }}>XGBOOST · MULTI-SEASON · LEAKAGE-SAFE</div>
         </footer>
       </div>

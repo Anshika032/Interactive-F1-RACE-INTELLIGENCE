@@ -146,9 +146,7 @@ export default function HeroSection() {
 
           <div ref={titleRef} style={{ opacity: 0 }}>
             <h1 className="mt-6 bg-[linear-gradient(135deg,#FF1500_0%,#FF4500_30%,#FF8C00_60%,#FFD700_85%,#FF4500_100%)] bg-clip-text text-[4rem] md:text-[6rem] lg:text-[7rem] font-black leading-[0.9] text-transparent drop-shadow-[0_0_40px_rgba(255,69,0,0.5)]">
-              RACE
-              <br />
-              ORACLE
+              PITWALL
             </h1>
           </div>
 
