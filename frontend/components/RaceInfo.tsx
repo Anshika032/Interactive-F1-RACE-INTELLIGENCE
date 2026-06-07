@@ -1,8 +1,14 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import {
+  SECTOR_1_PATH,
+  SECTOR_2_PATH,
+  SECTOR_3_PATH,
+} from '@/src/data/monaco-sectors'
 
-// Next race data — update after each race
+// ─── Race config ──────────────────────────────────────────────────────────────
+
 const NEXT_RACE = {
   name: 'Monaco Grand Prix',
   circuit: 'Circuit de Monaco',
@@ -18,83 +24,19 @@ const NEXT_RACE = {
   coords: { lat: 43.7347, lon: 7.4206 },
 }
 
-// Monaco circuit SVG path — simplified outline
-const MONACO_PATH = `
-  M 160,40 L 220,38 L 260,55 L 275,80 L 265,110
-  L 240,130 L 200,140 L 180,160 L 175,185
-  L 185,205 L 210,215 L 240,210 L 265,195
-  L 280,175 L 285,150 L 275,125
-  L 290,100 L 310,85 L 330,90 L 340,110
-  L 330,135 L 300,155 L 270,165
-  L 255,185 L 250,210 L 255,235
-  L 270,250 L 295,255 L 320,245
-  L 335,225 L 330,200 L 310,185
-  L 295,175 L 300,155
-`
+// ─── Animation path ───────────────────────────────────────────────────────────
+// GPS-derived waypoints mapped to the real SVG coordinate space (2000×2000 viewBox)
+// Clockwise: SF → Ste Devote → Beau Rivage → Casino → Mirabeau → Fairmont →
+//            Portier → Tunnel → Chicane → Piscine → Rascasse → back to SF
+const ANIMATION_PATH =
+  'M 410,810 L 440,760 L 540,720 L 580,640 L 555,530 ' +
+  'L 680,600 L 760,680 L 760,780 L 720,860 L 820,900 ' +
+  'L 920,950 L 1040,1000 ' +           // ← S1 ends here (Tunnel entry)
+  'L 1200,1050 L 1400,1100 L 1540,1200 L 1470,1250 ' +
+  'L 1300,1310 L 1420,1330 L 1560,1360 ' + // ← S2 ends here (Piscine exit)
+  'L 1400,1390 L 900,1350 L 600,1200 L 510,1060 L 410,960 L 410,810'
 
-const CIRCUIT_PATHS: Record<string, { path: string; viewBox: string; label: string }> = {
-  'Monaco Grand Prix': {
-    viewBox: '0 0 400 320',
-    label: 'Circuit de Monaco',
-    path: `M 200,30 L 260,28 L 300,45 L 315,75 L 305,105
-           L 275,128 L 235,138 L 210,158 L 202,182
-           L 212,205 L 238,215 L 268,208 L 288,190
-           L 295,168 L 285,142
-           L 300,115 L 322,98 L 345,103 L 355,125
-           L 343,152 L 310,172 L 278,182
-           L 262,205 L 256,232 L 262,258
-           L 278,272 L 305,276 L 330,264
-           L 345,242 L 338,215 L 316,198
-           L 298,186 L 302,168
-           L 318,142 L 338,128 L 358,132
-           L 365,152 L 355,175 L 332,188
-           L 308,195 L 290,210 L 278,230
-           L 272,255 L 265,275 L 248,285
-           L 225,288 L 202,280 L 185,262
-           L 178,240 L 182,215 L 195,195
-           L 185,175 L 168,162 L 145,155
-           L 122,158 L 102,172 L 92,192
-           L 95,215 L 110,230 L 132,235
-           L 155,228 L 170,212 L 168,192
-           L 155,178 L 138,172
-           L 118,145 L 108,118 L 115,92
-           L 135,72 L 162,58 L 190,48 Z`,
-  },
-  'Barcelona Grand Prix': {
-    viewBox: '0 0 400 300',
-    label: 'Circuit de Barcelona-Catalunya',
-    path: `M 60,80 L 180,75 L 280,80 L 330,100 L 345,130
-           L 330,160 L 295,175 L 260,170 L 235,185
-           L 220,210 L 225,235 L 248,248
-           L 275,245 L 295,228 L 290,205
-           L 270,192 L 248,188 L 232,198
-           L 215,215 L 210,240 L 220,262
-           L 242,272 L 268,268 L 285,252
-           L 280,230 L 262,218
-           L 240,212 L 225,222 L 218,242
-           L 225,260 L 245,268 L 265,262
-           L 275,245
-           L 252,235 L 238,220 L 240,205
-           L 255,195 L 275,192 L 295,198
-           L 312,215 L 315,238 L 302,255
-           L 278,262 L 255,258 L 238,242
-           L 235,220 L 248,205 L 268,198
-           L 285,202 L 298,218 L 295,238
-           L 280,250 L 260,252 L 245,240
-           L 242,222 L 255,210 L 272,208
-           L 288,215
-           L 320,188 L 345,165 L 348,138
-           L 335,110 L 308,92 L 270,82
-           L 175,78 L 65,82 L 42,100
-           L 38,130 L 50,155 L 75,165
-           L 100,160 L 118,145 L 112,122
-           L 92,108 L 68,102 Z`,
-  },
-}
-
-function getCircuitPath(raceName: string) {
-  return CIRCUIT_PATHS[raceName] || CIRCUIT_PATHS['Monaco Grand Prix']
-}
+// ─── Hooks ────────────────────────────────────────────────────────────────────
 
 function useCountdown(targetDate: string) {
   const [time, setTime] = useState({ days: 0, hours: 0, mins: 0, secs: 0 })
@@ -135,10 +77,11 @@ function useWeather(lat: number, lon: number) {
   return weather
 }
 
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export default function RaceInfo() {
   const countdown = useCountdown(NEXT_RACE.date)
   const weather = useWeather(NEXT_RACE.coords.lat, NEXT_RACE.coords.lon)
-  const circuit = getCircuitPath(NEXT_RACE.name)
 
   const countdownUnits = [
     { label: 'DAYS',  val: countdown.days },
@@ -187,62 +130,179 @@ export default function RaceInfo() {
             ◈ CIRCUIT MAP
           </div>
 
-          {/* Circuit SVG */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-            <svg viewBox={circuit.viewBox} width="100%" style={{ maxWidth: 320, maxHeight: 200 }}>
-              {/* Glow filter */}
+          {/* Circuit SVG — real Iconscout geometry, 2000×2000 native space */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+            <svg
+              viewBox="365 494 1294 954"
+              width="100%"
+              style={{ maxWidth: 340, maxHeight: 220 }}
+              aria-label="Monaco Grand Prix circuit map"
+            >
               <defs>
-                <filter id="glow">
-                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                  <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
                 </filter>
-                <linearGradient id="trackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <filter id="glowStrong" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+                <linearGradient id="s1grad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#FF4500"/>
-                  <stop offset="50%" stopColor="#FF8C00"/>
-                  <stop offset="100%" stopColor="#FFD700"/>
+                  <stop offset="100%" stopColor="#FF6600"/>
+                </linearGradient>
+                <linearGradient id="s2grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FF8C00"/>
+                  <stop offset="100%" stopColor="#FFB000"/>
+                </linearGradient>
+                <linearGradient id="s3grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FFD700"/>
+                  <stop offset="100%" stopColor="#FF4500"/>
                 </linearGradient>
               </defs>
-              {/* Track shadow */}
-              <path d={circuit.path} fill="none" stroke="rgba(255,69,0,0.15)" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
-              {/* Main track */}
+
+              {/* Track base shadow — all 3 sector paths at low opacity for depth */}
+              <path d={SECTOR_1_PATH} fill="none" stroke="rgba(255,100,0,0.08)" strokeWidth="10" strokeLinecap="round"/>
+              <path d={SECTOR_2_PATH} fill="none" stroke="rgba(255,100,0,0.08)" strokeWidth="10" strokeLinecap="round"/>
+              <path d={SECTOR_3_PATH} fill="none" stroke="rgba(255,100,0,0.08)" strokeWidth="10" strokeLinecap="round"/>
+
+              {/* Sector 1 — S/F → Tunnel entry (orange-red) */}
               <motion.path
-                d={circuit.path}
+                d={SECTOR_1_PATH}
                 fill="none"
-                stroke="url(#trackGrad)"
-                strokeWidth="3"
+                stroke="url(#s1grad)"
+                strokeWidth="2.5"
                 strokeLinecap="round"
-                strokeLinejoin="round"
                 filter="url(#glow)"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 2.5, ease: 'easeInOut', delay: 0.3 }}
-              />
-              {/* Start/finish dot */}
-              <motion.circle
-                cx="200" cy="30" r="5"
-                fill="#FF4500"
-                filter="url(#glow)"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 2.8, duration: 0.4 }}
-              />
-              <motion.text
-                x="210" y="25"
-                fill="rgba(255,150,60,0.7)"
-                fontSize="10"
-                fontFamily="Orbitron, monospace"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 3 }}
+                transition={{ duration: 1.5, ease: 'easeInOut', delay: 0.2 }}
+              />
+
+              {/* Sector 2 — Tunnel → Piscine exit (amber) */}
+              <motion.path
+                d={SECTOR_2_PATH}
+                fill="none"
+                stroke="url(#s2grad)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                filter="url(#glow)"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.5, ease: 'easeInOut', delay: 0.8 }}
+              />
+
+              {/* Sector 3 — Rascasse → S/F (gold) */}
+              <motion.path
+                d={SECTOR_3_PATH}
+                fill="none"
+                stroke="url(#s3grad)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                filter="url(#glow)"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.5, ease: 'easeInOut', delay: 1.4 }}
+              />
+
+              {/* Tunnel section dashed overlay */}
+              <motion.path
+                d="M 1040,1000 L 1200,1050 L 1400,1100 L 1540,1200"
+                fill="none"
+                stroke="rgba(255,200,80,0.6)"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeDasharray="18,12"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2, duration: 0.5 }}
+              />
+
+              {/* Start/Finish line */}
+              <motion.line
+                x1="510" y1="930" x2="535" y2="958"
+                stroke="#FF4500"
+                strokeWidth="6"
+                filter="url(#glowStrong)"
+                initial={{ opacity: 0, scaleY: 0 }}
+                animate={{ opacity: 1, scaleY: 1 }}
+                transition={{ delay: 2.0, duration: 0.4 }}
+              />
+
+              {/* Corner labels */}
+              {([
+                [522,  530,  'Casino',  'middle'],
+                [470,  895,  'T1',      'end'   ],
+                [500,  970,  'S/F',     'middle'],
+                [968,  920,  'Hairpin', 'end'   ],
+                [1529, 1235, 'Chicane', 'middle'],
+                [1262, 1300, 'Tabac',   'start' ],
+              ] as const).map(([x, y, t, anchor]) => (
+                <motion.text
+                  key={t}
+                  x={x} y={y}
+                  fill="rgba(255,150,60,0.55)"
+                  fontSize="28"
+                  fontFamily="Orbitron, monospace"
+                  textAnchor={anchor}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 2.2, duration: 0.6 }}
+                >
+                  {t}
+                </motion.text>
+              ))}
+
+              {/* Animated racing dot */}
+              <motion.circle
+                r="18"
+                fill="#FF4500"
+                filter="url(#glowStrong)"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 1, 1, 0.8] }}
+                transition={{ delay: 2.5, duration: 0.5 }}
               >
-                S/F
-              </motion.text>
+                <animateMotion
+                  dur="10s"
+                  repeatCount="indefinite"
+                  begin="2.5s"
+                  path={ANIMATION_PATH}
+                />
+              </motion.circle>
+
+              {/* Sector divider dots — S1/S2 boundary, S2/S3 boundary */}
+              {([
+                [1089, 1018, '#FF6600', 'S1'],
+                [1490, 1358, '#FFB000', 'S2'],
+              ] as const).map(([x, y, color, label]) => (
+                <motion.g key={label} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.0 }}>
+                  <circle cx={x} cy={y} r="14" fill={color} filter="url(#glow)" />
+                  <text x={x + 20} y={y + 10} fill={color} fontSize="24" fontFamily="Orbitron, monospace" opacity="0.8">{label}</text>
+                </motion.g>
+              ))}
+
+              {/* Sector legend */}
+              <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5 }}>
+                <rect x="380" y="1420" width="28" height="10" fill="#FF4500" rx="3"/>
+                <text x="416" y="1432" fill="rgba(255,100,50,0.6)" fontSize="22" fontFamily="Orbitron, monospace">S1</text>
+                <rect x="490" y="1420" width="28" height="10" fill="#FFB000" rx="3"/>
+                <text x="526" y="1432" fill="rgba(255,100,50,0.6)" fontSize="22" fontFamily="Orbitron, monospace">S2</text>
+                <rect x="600" y="1420" width="28" height="10" fill="#FFD700" rx="3"/>
+                <text x="636" y="1432" fill="rgba(255,100,50,0.6)" fontSize="22" fontFamily="Orbitron, monospace">S3</text>
+                <text x="720" y="1432" fill="rgba(255,100,50,0.4)" fontSize="22" fontFamily="Orbitron, monospace">- - TUNNEL</text>
+              </motion.g>
             </svg>
           </div>
 
           {/* Circuit label */}
           <div style={{ textAlign: 'center', fontFamily: 'Rajdhani, sans-serif', fontSize: 12, color: 'rgba(255,150,60,0.4)', letterSpacing: 2, marginBottom: 20 }}>
-            {circuit.label}
+            {NEXT_RACE.circuit}
           </div>
 
           {/* Stats grid */}
@@ -259,7 +319,6 @@ export default function RaceInfo() {
             ))}
           </div>
 
-          {/* Lap record note */}
           <div style={{ marginTop: 10, fontFamily: 'Rajdhani, sans-serif', fontSize: 11, color: 'rgba(255,150,60,0.35)', textAlign: 'center' }}>
             {NEXT_RACE.lapRecordHolder} · {NEXT_RACE.lapRecordYear}
           </div>
@@ -311,7 +370,6 @@ export default function RaceInfo() {
             {weather ? (
               <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 20 }}>
-                  {/* Weather icon */}
                   <div style={{ fontSize: 48 }}>
                     {weather.rain > 60 ? '🌧️' : weather.rain > 30 ? '⛅' : '☀️'}
                   </div>
@@ -325,7 +383,6 @@ export default function RaceInfo() {
                   </div>
                 </div>
 
-                {/* Rain probability bar */}
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                     <span style={{ fontFamily: 'Orbitron, monospace', fontSize: 8, letterSpacing: 2, color: 'rgba(255,120,50,0.4)' }}>RAIN PROBABILITY</span>
@@ -347,7 +404,6 @@ export default function RaceInfo() {
                   </div>
                 </div>
 
-                {/* Wet race indicator */}
                 {weather.rain > 40 && (
                   <motion.div
                     initial={{ opacity: 0 }}
