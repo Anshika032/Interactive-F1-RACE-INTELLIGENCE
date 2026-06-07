@@ -25,6 +25,7 @@ function CarModel() {
     if (child.isMesh) {
       child.castShadow = true
       child.receiveShadow = true
+      console.log('mesh:', child.name, '| material:', child.material?.name)
     }
   })
 
