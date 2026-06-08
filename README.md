@@ -1,4 +1,4 @@
-# 🏎️ Race Oracle — Interactive F1 Race Intelligence
+# 🏎️ Pitwall — Interactive F1 Race Intelligence
 
 > AI-powered Formula 1 race prediction platform. Predicts finishing positions for all 20 drivers per Grand Prix using XGBoost trained on 5 seasons of real F1 data.
 
@@ -11,7 +11,7 @@
 
 ## Overview
 
-Race Oracle is a full-stack motorsport intelligence platform that combines machine learning with real-time F1 data. It ingests FastF1 telemetry, computes composite driver strength features, and serves predictions via a FastAPI backend to a Next.js frontend with 3D visualization.
+Pitwall is a full-stack motorsport intelligence platform that combines machine learning with real-time F1 data. It ingests FastF1 telemetry, computes composite driver strength features, and serves predictions via a FastAPI backend to a Next.js frontend with 3D visualization.
 
 **Core capabilities:**
 - Per-driver finishing position prediction for all 20 drivers before each race
