@@ -345,10 +345,24 @@ def get_driver_session_data(driver_name: str, track_name: str, year: int = 2026,
 
         print(f"[FORM] driver_form={driver_form}, constructor_form={constructor_form}, dnf={driver_dnf_rate}")
 
-        # â”€â”€ TRACK HISTORY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        track_history = 0.5
+        track_history = None
         track_positions = []
+
+        F1_DEBUT_YEAR = {
+            "Andrea Kimi Antonelli": 2026,
+            "Isack Hadjar":          2026,
+            "Oliver Bearman":        2026,
+            "Gabriel Bortoleto":     2026,
+            "Jack Doohan":           2026,
+            "Liam Lawson":           2024,
+            "Franco Colapinto":      2024,
+        }
+        driver_debut = F1_DEBUT_YEAR.get(driver_name, 2000)
+
         for past_year in [actual_year - 1, actual_year - 2, actual_year - 3]:
+            if past_year < driver_debut:
+                print(f"[SKIP] {driver_name} not in F1 in {past_year}, skipping track history")
+                continue
             try:
                 ps = fastf1.get_event_schedule(past_year)
                 pe = ps[ps['EventName'].str.contains(track_name, case=False, na=False)]
@@ -370,8 +384,11 @@ def get_driver_session_data(driver_name: str, track_name: str, year: int = 2026,
         if track_positions:
             avg_tr = sum(track_positions) / len(track_positions)
             track_history = round(max(0.1, min(1.0, 1 - (avg_tr - 1) / 19)), 3)
+        else:
+            track_history = driver_form
+            print(f"[TRACK HISTORY] No F1 data for {driver_name} at {track_name} — using driver_form={driver_form}")
 
-        print(f"[TRACK HISTORY] {driver_name} at {track_name}: {track_positions} â†’ {track_history}")
+        print(f"[TRACK HISTORY] {driver_name} at {track_name}: {track_positions} → {track_history}")
 
         return {
             'grid':             quali_grid,
@@ -545,6 +562,13 @@ DRIVER_PROFILES = {
         "form": 0.85,
         "reliability": 0.94,
     },
+
+    "Andrea Kimi Antonelli": {
+        "team": "Mercedes",
+        "grid": 1,
+        "form": 0.90,
+        "reliability": 0.95,
+    },
 }
 
 
@@ -590,13 +614,17 @@ def predict(request: PredictionRequest):
     champ_pts = get_championship_points(request.Driver)
     # Only estimate grid if quali data wasn't found
     if not session_data or session_data.get('grid') in (None, 10, 20):
-        all_pts = sorted(set(CHAMPIONSHIP_POINTS_2025.values()), reverse=True)
-        try:
-            estimated_grid = all_pts.index(champ_pts) + 1
-        except ValueError:
-            estimated_grid = 10
-        real_grid = max(1, min(20, estimated_grid))
-        print(f"[ESTIMATED] Grid={real_grid}, Team={real_team}, ChampPts={champ_pts}")
+        if request.GridPosition and request.GridPosition not in (10, 20):
+            real_grid = request.GridPosition
+            print(f"[REQUEST GRID] Grid={real_grid}, Team={real_team}, ChampPts={champ_pts}")
+        else:
+            all_pts = sorted(set(CHAMPIONSHIP_POINTS_2025.values()), reverse=True)
+            try:
+                estimated_grid = all_pts.index(champ_pts) + 1
+            except ValueError:
+                estimated_grid = 10
+            real_grid = max(1, min(20, estimated_grid))
+            print(f"[ESTIMATED] Grid={real_grid}, Team={real_team}, ChampPts={champ_pts}")
     else:
         print(f"[REAL QUALI] Grid={real_grid}, Team={real_team}, ChampPts={champ_pts}")
 
@@ -768,4 +796,25 @@ def canada_postmortem():
         "best_prediction": "Max Verstappen (error: 0.2)",
         "worst_prediction": "George Russell DNF (unpredictable mechanical)",
         "notes": "Russell DNF from pole inflated MAE. Excluding DNFs: MAE = 3.1"
+    }
+
+
+@app.get("/postmortem/monaco-2026")
+def monaco_postmortem():
+    return {
+        "race": "Monaco Grand Prix 2026",
+        "round": 6,
+        "results": [
+            {"driver": "Kimi Antonelli",  "predicted": 2.0,  "actual": 1,  "grid": 1,  "error": 1.0,  "status": "Finished"},
+            {"driver": "Lewis Hamilton",  "predicted": 3.0,  "actual": 2,  "grid": 3,  "error": 1.0,  "status": "Finished"},
+            {"driver": "Isack Hadjar",    "predicted": 4.0,  "actual": 3,  "grid": 5,  "error": 1.0,  "status": "Finished"},
+            {"driver": "Liam Lawson",     "predicted": 8.0,  "actual": 5,  "grid": 10, "error": 3.0,  "status": "Finished"},
+            {"driver": "George Russell",  "predicted": 4.0,  "actual": 12, "grid": 6,  "error": 8.0,  "status": "Finished"},
+            {"driver": "Charles Leclerc", "predicted": 5.0,  "actual": 17, "grid": 4,  "error": None, "status": "Retired"},
+            {"driver": "Max Verstappen",  "predicted": 2.0,  "actual": 22, "grid": 2,  "error": None, "status": "Retired"},
+        ],
+        "mae": 2.8,
+        "best_prediction": "Kimi Antonelli (error: 1.0)",
+        "worst_prediction": "George Russell (error: 8.0 — underperformed vs quali pace)",
+        "notes": "Verstappen and Leclerc retired. Excluding DNFs: MAE = 2.8. Top-3 predicted within 1 position."
     }

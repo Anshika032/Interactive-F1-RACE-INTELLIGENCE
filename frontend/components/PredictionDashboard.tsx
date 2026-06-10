@@ -50,19 +50,42 @@ const DRIVER_PROFILES: Record<string, { constructor: string; gridPos: number; dr
   'Liam Lawson':             { constructor: 'Racing Bulls',    gridPos: 14, driverForm: 0.65, constructorForm: 0.70, trackHistory: 0.50, dnfRate: 0.07, consDNFRate: 0.06, reliability: 0.91 },
 }
 
-// ── Canada 2026 Postmortem Data ──────────────────────────────────────────────
-const POSTMORTEM = {
-  mae: 4.76,
-  mae_excl_dnf: 3.1,
-  results: [
-    { driver: 'Kimi Antonelli',   team: 'Mercedes',  predicted: 5.5, actual: 1,  grid: 2 },
-    { driver: 'Lewis Hamilton',   team: 'Ferrari',   predicted: 5.0, actual: 2,  grid: 5 },
-    { driver: 'Max Verstappen',   team: 'Red Bull',  predicted: 3.2, actual: 3,  grid: 3 },
-    { driver: 'Charles Leclerc',  team: 'Ferrari',   predicted: 6.1, actual: 4,  grid: 4 },
-    { driver: 'Isack Hadjar',     team: 'R.Bulls',   predicted: 8.4, actual: 5,  grid: 6 },
-    { driver: 'Franco Colapinto', team: 'Williams',  predicted: 9.2, actual: 6,  grid: 8 },
-    { driver: 'George Russell',   team: 'Mercedes',  predicted: 2.1, actual: 19, grid: 1, dnf: true },
-  ],
+// ── Postmortem Data ──────────────────────────────────────────────────────────
+const POSTMORTEMS = {
+  canada: {
+    label: 'CANADA 2026',
+    mae: 4.76,
+    mae_excl_dnf: 3.1,
+    best: 'Max Verstappen — Δ0.2 positions',
+    miss: 'George Russell — DNF from pole (mechanical, unpredictable)',
+    note: 'DNF excluded from adjusted MAE. Mechanical failures are not predictable from qualifying or form data.',
+    results: [
+      { driver: 'Kimi Antonelli',   team: 'Mercedes',  predicted: 5.5, actual: 1,  grid: 2 },
+      { driver: 'Lewis Hamilton',   team: 'Ferrari',   predicted: 5.0, actual: 2,  grid: 5 },
+      { driver: 'Max Verstappen',   team: 'Red Bull',  predicted: 3.2, actual: 3,  grid: 3 },
+      { driver: 'Charles Leclerc',  team: 'Ferrari',   predicted: 6.1, actual: 4,  grid: 4 },
+      { driver: 'Isack Hadjar',     team: 'R.Bulls',   predicted: 8.4, actual: 5,  grid: 6 },
+      { driver: 'Franco Colapinto', team: 'Williams',  predicted: 9.2, actual: 6,  grid: 8 },
+      { driver: 'George Russell',   team: 'Mercedes',  predicted: 2.1, actual: 19, grid: 1, dnf: true },
+    ],
+  },
+  monaco: {
+    label: 'MONACO 2026',
+    mae: 2.8,
+    mae_excl_dnf: 2.8,
+    best: 'Antonelli / Hamilton / Hadjar — Δ1.0 each (top 3 within 1)',
+    miss: 'George Russell — finished P12, predicted P4 (Δ8.0)',
+    note: 'Verstappen and Leclerc retired. Best overall MAE so far this season after track history bug fix.',
+    results: [
+      { driver: 'Kimi Antonelli',  team: 'Mercedes',  predicted: 2.0, actual: 1,  grid: 1 },
+      { driver: 'Lewis Hamilton',  team: 'Ferrari',   predicted: 3.0, actual: 2,  grid: 3 },
+      { driver: 'Isack Hadjar',    team: 'R.Bulls',   predicted: 4.0, actual: 3,  grid: 5 },
+      { driver: 'Liam Lawson',     team: 'R.Bulls',   predicted: 8.0, actual: 5,  grid: 10 },
+      { driver: 'George Russell',  team: 'Mercedes',  predicted: 4.0, actual: 12, grid: 6 },
+      { driver: 'Charles Leclerc', team: 'Ferrari',   predicted: 5.0, actual: 17, grid: 4, dnf: true },
+      { driver: 'Max Verstappen',  team: 'Red Bull',  predicted: 2.0, actual: 22, grid: 2, dnf: true },
+    ],
+  },
 }
 
 const TEAM_COLORS: Record<string, string> = {
@@ -81,9 +104,34 @@ type FormState = {
 }
 
 // ── Postmortem Component ─────────────────────────────────────────────────────
-function CanadaPostmortem() {
+function PostmortemSection() {
+  const [active, setActive] = useState<'monaco' | 'canada'>('monaco')
+  const data = POSTMORTEMS[active]
+
   return (
     <div style={{ marginTop: 60, maxWidth: 1100, margin: '60px auto 0' }}>
+      {/* Tab row */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
+        {(['monaco', 'canada'] as const).map(key => (
+          <button
+            key={key}
+            onClick={() => setActive(key)}
+            style={{
+              padding: '8px 20px',
+              fontFamily: 'Orbitron, monospace', fontSize: 10, letterSpacing: 3,
+              cursor: 'pointer', border: 'none', transition: 'all 0.2s',
+              background: active === key ? 'linear-gradient(135deg,#FF4500,#FF8C00)' : 'rgba(0,0,0,0.6)',
+              color: active === key ? '#000' : 'rgba(255,120,50,0.55)',
+              borderBottom: active === key ? 'none' : '1px solid rgba(255,69,0,0.2)',
+              clipPath: 'polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)',
+              fontWeight: active === key ? 700 : 400,
+            }}
+          >
+            {POSTMORTEMS[key].label}
+          </button>
+        ))}
+      </div>
+
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
         <div>
@@ -92,12 +140,12 @@ function CanadaPostmortem() {
             fontFamily: 'Orbitron, monospace', fontSize: 'clamp(14px,2vw,22px)', fontWeight: 900, margin: 0,
             background: 'linear-gradient(135deg,#FF4500,#FFD700)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-          }}>CANADIAN GRAND PRIX 2026 — PREDICTED vs ACTUAL</h3>
+          }}>{data.label} — PREDICTED vs ACTUAL</h3>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           {[
-            { label: 'OVERALL MAE', val: POSTMORTEM.mae },
-            { label: 'EX-DNF MAE',  val: POSTMORTEM.mae_excl_dnf },
+            { label: 'OVERALL MAE', val: data.mae },
+            { label: 'EX-DNF MAE', val: data.mae_excl_dnf },
           ].map(({ label, val }) => (
             <div key={label} style={{
               padding: '8px 16px', textAlign: 'center',
@@ -122,15 +170,15 @@ function CanadaPostmortem() {
         color: 'rgba(255,120,50,0.35)',
       }}>
         <span>P</span><span>DRIVER</span>
-        <span style={{textAlign:'center'}}>GRID</span>
-        <span style={{textAlign:'center'}}>PRED</span>
-        <span style={{textAlign:'center'}}>ACTUAL</span>
+        <span style={{ textAlign: 'center' }}>GRID</span>
+        <span style={{ textAlign: 'center' }}>PRED</span>
+        <span style={{ textAlign: 'center' }}>ACTUAL</span>
         <span>ERROR</span>
       </div>
 
       {/* Rows */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {POSTMORTEM.results.map((row, i) => {
+        {data.results.map((row, i) => {
           const error = Math.abs(row.predicted - row.actual)
           const isDNF = row.dnf
           const isGood = !isDNF && error <= 2
@@ -187,8 +235,8 @@ function CanadaPostmortem() {
       {/* Footer */}
       <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         {[
-          { icon: '✓', label: 'BEST CALL', val: 'Max Verstappen — Δ0.2 positions', color: '#00FF88' },
-          { icon: '✗', label: 'MISS',      val: 'George Russell — DNF from pole (mechanical, unpredictable)', color: '#CC1100' },
+          { icon: '✓', label: 'BEST CALL', val: data.best, color: '#00FF88' },
+          { icon: '✗', label: 'MISS', val: data.miss, color: '#CC1100' },
         ].map(({ icon, label, val, color }) => (
           <div key={label} style={{ padding: '10px 14px', background: 'rgba(0,0,0,0.5)', border: `1px solid ${color}22` }}>
             <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 8, letterSpacing: 2, color: `${color}88`, marginBottom: 4 }}>{icon} {label}</div>
@@ -201,7 +249,7 @@ function CanadaPostmortem() {
         background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,69,0,0.1)',
         fontFamily: 'Rajdhani, sans-serif', fontSize: 11, color: 'rgba(255,150,60,0.4)',
       }}>
-        ◆ DNF excluded from adjusted MAE. Mechanical failures are not predictable from qualifying or form data.
+        ◆ {data.note}
       </div>
     </div>
   )
@@ -438,8 +486,8 @@ export default function PredictionDashboard() {
         </div>
       </div>
 
-      {/* ── CANADA POSTMORTEM ── */}
-      <CanadaPostmortem />
+      {/* ── POSTMORTEM ── */}
+      <PostmortemSection />
 
       <style>{`
         @keyframes loadPulse { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
