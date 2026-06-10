@@ -46,6 +46,7 @@ EXTRA_RACES = [
     (2026, 3),   # Japanese Grand Prix
     (2026, 4),   # Miami Grand Prix
     (2026, 5),   # Canadian Grand Prix
+    (2026, 6),   # Monaco Grand Prix
 ]
 
 POINTS_MAP = {1:25, 2:18, 3:15, 4:12, 5:10, 6:8, 7:6, 8:4, 9:2, 10:1}
