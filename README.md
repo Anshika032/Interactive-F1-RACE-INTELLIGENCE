@@ -197,6 +197,21 @@ git add -f frontend/src/data/monaco-sectors.ts
 
 Primary error source: no circuit-specific car pace signal — Antonelli's Mercedes pace advantage at Canada was invisible to the model.
 
+## Monaco 2026 Postmortem
+
+| Driver | Grid | Predicted | Actual | Error |
+|--------|------|-----------|--------|-------|
+| Kimi Antonelli | P1 | P2 | P1 | 1.0 |
+| Lewis Hamilton | P3 | P3 | P2 | 1.0 |
+| Isack Hadjar | P5 | P4 | P3 | 1.0 |
+| Liam Lawson | P10 | P8 | P5 | 3.0 |
+| George Russell | P6 | P4 | P12 | 8.0 |
+| Charles Leclerc | P4 | P5 | Retired | — |
+| Max Verstappen | P2 | P2 | Retired | — |
+
+**Race MAE:** 2.8 &nbsp;|&nbsp; **Ex-DNF MAE:** 2.8
+
+Top-3 predicted within 1 position each. Primary error: Russell underperformed relative to Mercedes pace. Fix applied this round: rookie track history now filters pre-F1 seasons, preventing F2 result contamination.
 ---
 
 ## Known Limitations
@@ -210,11 +225,15 @@ Primary error source: no circuit-specific car pace signal — Antonelli's Merced
 
 ## Roadmap
 
-- [ ] `DriverStrength` composite feature integration into live predictions
-- [ ] `colsample_bytree=0.6` rebalance to reduce `QualiPosition` dominance
-- [ ] Live weather feature injection at prediction time via OpenMeteo
+- [x] `DriverStrength` composite feature — built and live
+- [x] `colsample_bytree=0.6` rebalance — `QualiPosition` dominance dropped from 39.8% to 12.8%
+- [x] Rookie track history fix — F1 debut year filter prevents F2 data contamination
+- [x] Tabbed postmortem UI — Canada and Monaco results with animated error bars
+- [ ] `TrackConstructorForm` — constructor avg finish at specific circuit, last 3 seasons
+- [ ] Live weather injection at prediction time via OpenMeteo
 - [ ] Telemetry charts on prediction dashboard
-- [ ] Barcelona GP prediction
+- [ ] All-circuit race info panel (laps, length, lap record, DRS zones)
+- [ ] Barcelona GP prediction — June 14
 
 ---
 
