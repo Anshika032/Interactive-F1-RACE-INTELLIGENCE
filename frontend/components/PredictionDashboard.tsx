@@ -3,11 +3,13 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import gsap from 'gsap'
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+
 const DRIVERS = [
   'Max Verstappen', 'Lando Norris', 'Charles Leclerc',
   'Oscar Piastri', 'George Russell', 'Carlos Sainz',
   'Lewis Hamilton', 'Andrea Kimi Antonelli',
-  'Sergio Pérez', 'Arvid Lindblad', 'Isack Hadjar',
+  'Arvid Lindblad', 'Isack Hadjar',
   'Fernando Alonso', 'Lance Stroll',
   'Pierre Gasly', 'Franco Colapinto',
   'Oliver Bearman', 'Esteban Ocon',
@@ -29,25 +31,24 @@ const TRACKS = [
 const DRIVER_PROFILES: Record<string, { constructor: string; gridPos: number; driverForm: number; constructorForm: number; trackHistory: number; dnfRate: number; consDNFRate: number; reliability: number }> = {
   'Max Verstappen':          { constructor: 'Red Bull Racing', gridPos: 5,  driverForm: 0.98, constructorForm: 0.97, trackHistory: 0.95, dnfRate: 0.04, consDNFRate: 0.03, reliability: 0.99 },
   'Lando Norris':            { constructor: 'McLaren',         gridPos: 4,  driverForm: 0.93, constructorForm: 0.91, trackHistory: 0.80, dnfRate: 0.05, consDNFRate: 0.05, reliability: 0.96 },
-  'Charles Leclerc':         { constructor: 'Ferrari',         gridPos: 10,  driverForm: 0.88, constructorForm: 0.87, trackHistory: 0.85, dnfRate: 0.08, consDNFRate: 0.07, reliability: 0.93 },
-  'Carlos Sainz':            { constructor: 'Williams',        gridPos: 16,  driverForm: 0.85, constructorForm: 0.82, trackHistory: 0.82, dnfRate: 0.06, consDNFRate: 0.07, reliability: 0.94 },
+  'Charles Leclerc':         { constructor: 'Ferrari',         gridPos: 10, driverForm: 0.88, constructorForm: 0.87, trackHistory: 0.85, dnfRate: 0.08, consDNFRate: 0.07, reliability: 0.93 },
+  'Carlos Sainz':            { constructor: 'Williams',        gridPos: 16, driverForm: 0.85, constructorForm: 0.82, trackHistory: 0.82, dnfRate: 0.06, consDNFRate: 0.07, reliability: 0.94 },
   'Lewis Hamilton':          { constructor: 'Ferrari',         gridPos: 2,  driverForm: 0.86, constructorForm: 0.87, trackHistory: 0.90, dnfRate: 0.05, consDNFRate: 0.07, reliability: 0.95 },
   'George Russell':          { constructor: 'Mercedes',        gridPos: 1,  driverForm: 0.83, constructorForm: 0.84, trackHistory: 0.78, dnfRate: 0.06, consDNFRate: 0.05, reliability: 0.94 },
-  'Fernando Alonso':         { constructor: 'Aston Martin',    gridPos: 22,  driverForm: 0.80, constructorForm: 0.78, trackHistory: 0.88, dnfRate: 0.07, consDNFRate: 0.08, reliability: 0.92 },
+  'Fernando Alonso':         { constructor: 'Aston Martin',    gridPos: 22, driverForm: 0.80, constructorForm: 0.78, trackHistory: 0.88, dnfRate: 0.07, consDNFRate: 0.08, reliability: 0.92 },
   'Oscar Piastri':           { constructor: 'McLaren',         gridPos: 7,  driverForm: 0.87, constructorForm: 0.91, trackHistory: 0.72, dnfRate: 0.05, consDNFRate: 0.05, reliability: 0.95 },
-  'Sergio Pérez':            { constructor: 'Cadillac', gridPos: 19,  driverForm: 0.75, constructorForm: 0.97, trackHistory: 0.80, dnfRate: 0.09, consDNFRate: 0.03, reliability: 0.91 },
   'Lance Stroll':            { constructor: 'Aston Martin',    gridPos: 21, driverForm: 0.68, constructorForm: 0.78, trackHistory: 0.65, dnfRate: 0.10, consDNFRate: 0.08, reliability: 0.89 },
-  'Andrea Kimi Antonelli':   { constructor: 'Mercedes',        gridPos: 3,  driverForm: 0.99, constructorForm: 0.95, trackHistory: 0.85, dnfRate: 0.02, consDNFRate: 0.03, reliability: 0.98 },
+  'Andrea Kimi Antonelli':   { constructor: 'Mercedes',        gridPos: 3,  driverForm: 0.91, constructorForm: 0.95, trackHistory: 0.75, dnfRate: 0.05, consDNFRate: 0.03, reliability: 0.94 },
   'Isack Hadjar':            { constructor: 'Racing Bulls',    gridPos: 6,  driverForm: 0.72, constructorForm: 0.70, trackHistory: 0.50, dnfRate: 0.06, consDNFRate: 0.06, reliability: 0.93 },
   'Arvid Lindblad':          { constructor: 'Racing Bulls',    gridPos: 11, driverForm: 0.65, constructorForm: 0.70, trackHistory: 0.40, dnfRate: 0.08, consDNFRate: 0.06, reliability: 0.90 },
   'Pierre Gasly':            { constructor: 'Alpine F1 Team',  gridPos: 14, driverForm: 0.68, constructorForm: 0.65, trackHistory: 0.60, dnfRate: 0.08, consDNFRate: 0.09, reliability: 0.90 },
-  'Franco Colapinto':             { constructor: 'Alpine F1 Team',  gridPos: 13, driverForm: 0.60, constructorForm: 0.65, trackHistory: 0.45, dnfRate: 0.09, consDNFRate: 0.09, reliability: 0.89 },
+  'Franco Colapinto':        { constructor: 'Alpine F1 Team',  gridPos: 13, driverForm: 0.60, constructorForm: 0.65, trackHistory: 0.45, dnfRate: 0.09, consDNFRate: 0.09, reliability: 0.89 },
   'Oliver Bearman':          { constructor: 'Haas F1 Team',    gridPos: 15, driverForm: 0.72, constructorForm: 0.68, trackHistory: 0.50, dnfRate: 0.07, consDNFRate: 0.08, reliability: 0.91 },
   'Esteban Ocon':            { constructor: 'Haas F1 Team',    gridPos: 17, driverForm: 0.65, constructorForm: 0.68, trackHistory: 0.60, dnfRate: 0.08, consDNFRate: 0.08, reliability: 0.90 },
   'Alexander Albon':         { constructor: 'Williams',        gridPos: 18, driverForm: 0.68, constructorForm: 0.72, trackHistory: 0.55, dnfRate: 0.07, consDNFRate: 0.07, reliability: 0.91 },
-  'Nico Hülkenberg':          { constructor: 'Audi',          gridPos: 9, driverForm: 0.62, constructorForm: 0.58, trackHistory: 0.55, dnfRate: 0.08, consDNFRate: 0.10, reliability: 0.89 },
-  'Gabriel Bortoleto':       { constructor: 'Audi',          gridPos: 12, driverForm: 0.60, constructorForm: 0.58, trackHistory: 0.45, dnfRate: 0.09, consDNFRate: 0.10, reliability: 0.88 },
-  'Liam Lawson':             { constructor: 'Racing Bulls',    gridPos: 8, driverForm: 0.65, constructorForm: 0.70, trackHistory: 0.50, dnfRate: 0.07, consDNFRate: 0.06, reliability: 0.91 },
+  'Nico Hülkenberg':         { constructor: 'Audi',            gridPos: 9,  driverForm: 0.62, constructorForm: 0.58, trackHistory: 0.55, dnfRate: 0.08, consDNFRate: 0.10, reliability: 0.89 },
+  'Gabriel Bortoleto':       { constructor: 'Audi',            gridPos: 12, driverForm: 0.60, constructorForm: 0.58, trackHistory: 0.45, dnfRate: 0.09, consDNFRate: 0.10, reliability: 0.88 },
+  'Liam Lawson':             { constructor: 'Racing Bulls',    gridPos: 8,  driverForm: 0.65, constructorForm: 0.70, trackHistory: 0.50, dnfRate: 0.07, consDNFRate: 0.06, reliability: 0.91 },
 }
 
 // ── Postmortem Data ───────────────────────────────────────────────────────
@@ -57,7 +58,7 @@ const POSTMORTEMS = {
     mae: 4.76,
     mae_excl_dnf: 3.1,
     best: 'Max Verstappen — Δ0.2 positions',
-    miss: 'George Russell â€” DNF from pole (mechanical, unpredictable)',
+    miss: 'George Russell — DNF from pole (mechanical, unpredictable)',
     note: 'DNF excluded from adjusted MAE. Mechanical failures are not predictable from qualifying or form data.',
     results: [
       { driver: 'Kimi Antonelli',   team: 'Mercedes',  predicted: 5.5, actual: 1,  grid: 2 },
@@ -110,7 +111,6 @@ function PostmortemSection() {
 
   return (
     <div style={{ marginTop: 60, maxWidth: 1100, margin: '60px auto 0' }}>
-      {/* Tab row */}
       <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
         {(['monaco', 'canada'] as const).map(key => (
           <button
@@ -132,7 +132,6 @@ function PostmortemSection() {
         ))}
       </div>
 
-      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
         <div>
           <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 10, letterSpacing: 4, color: '#FF4500', marginBottom: 8 }}>◆ MODEL POSTMORTEM</div>
@@ -162,7 +161,6 @@ function PostmortemSection() {
 
       <div style={{ height: 1, background: 'linear-gradient(90deg,#FF4500,rgba(255,69,0,0.1))', marginBottom: 16 }} />
 
-      {/* Column headers */}
       <div style={{
         display: 'grid', gridTemplateColumns: '28px 1fr 55px 55px 55px 1fr',
         gap: 12, padding: '0 16px 8px',
@@ -176,7 +174,6 @@ function PostmortemSection() {
         <span>ERROR</span>
       </div>
 
-      {/* Rows */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {data.results.map((row, i) => {
           const error = Math.abs(row.predicted - row.actual)
@@ -213,7 +210,6 @@ function PostmortemSection() {
               <div style={{ textAlign: 'center', fontFamily: 'Orbitron, monospace', fontSize: 12, fontWeight: 700, color: isDNF ? '#CC1100' : isGood ? '#00FF88' : '#FFD700' }}>
                 {isDNF ? '—' : `P${row.actual}`}
               </div>
-              {/* Error bar */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ flex: 1, height: 3, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
                   <motion.div
@@ -232,7 +228,6 @@ function PostmortemSection() {
         })}
       </div>
 
-      {/* Footer */}
       <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         {[
           { icon: '✓', label: 'BEST CALL', val: data.best, color: '#00FF88' },
@@ -263,18 +258,21 @@ export default function PredictionDashboard() {
   })
   const [prediction, setPrediction] = useState<any>(null)
   const [loading, setLoading] = useState(false)
+  const [apiError, setApiError] = useState<string | null>(null)
   const resultRef = useRef<HTMLDivElement>(null)
 
   const submit = async () => {
     if (!form.driver || !form.track) return
     setLoading(true)
+    setApiError(null)
+    setPrediction(null)
     const profile = DRIVER_PROFILES[form.driver] ?? DRIVER_PROFILES['Max Verstappen']
     try {
-      const res = await fetch('http://localhost:8000/predict', {
+      const res = await fetch(`${API_BASE}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          Round: 10,
+          Round: 7,
           Driver: form.driver,
           Constructor: profile.constructor,
           RaceName: form.track,
@@ -293,6 +291,7 @@ export default function PredictionDashboard() {
           ReliabilityScore: profile.reliability,
         }),
       })
+      if (!res.ok) throw new Error(`Server error: ${res.status}`)
       const data = await res.json()
       console.log('[API RESPONSE]', data)
       setPrediction(data)
@@ -301,9 +300,9 @@ export default function PredictionDashboard() {
           gsap.fromTo(resultRef.current, { opacity: 0, y: 40, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'power3.out' })
         }
       }, 50)
-    } catch (e) {
+    } catch (e: any) {
       console.error(e)
-      setPrediction({ predicted_position: 8, win_probability: 35, podium_probability: 42, confidence: 72, dnf_risk: 6 })
+      setApiError(e?.message ?? 'Backend unreachable. Make sure the prediction server is running.')
     } finally {
       setLoading(false)
     }
@@ -325,7 +324,6 @@ export default function PredictionDashboard() {
   return (
     <section id="prediction" style={{ padding: '80px 6vw', position: 'relative', zIndex: 10 }}>
 
-      {/* Section header */}
       <div style={{ textAlign: 'center', marginBottom: 60 }}>
         <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 10, letterSpacing: 5, color: '#FF4500', marginBottom: 14 }}>◆ AI PREDICTION ENGINE</div>
         <h2 style={{
@@ -391,7 +389,7 @@ export default function PredictionDashboard() {
         {/* RESULT PANEL */}
         <div style={{ position: 'relative' }}>
           <AnimatePresence>
-            {!prediction && (
+            {!prediction && !apiError && (
               <div style={{
                 height: '100%', minHeight: 360,
                 border: '1px solid rgba(255,140,0,0.3)',
@@ -404,6 +402,21 @@ export default function PredictionDashboard() {
               </div>
             )}
           </AnimatePresence>
+
+          {/* ERROR STATE */}
+          {apiError && (
+            <div style={{
+              height: '100%', minHeight: 360,
+              border: '1px solid rgba(200,0,0,0.4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexDirection: 'column', gap: 16,
+              background: 'rgba(40,0,0,0.7)', backdropFilter: 'blur(24px)', padding: 24,
+            }}>
+              <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 28, color: '#CC1100' }}>✗</div>
+              <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 10, letterSpacing: 3, color: '#CC1100' }}>PREDICTION FAILED</div>
+              <div style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 13, color: 'rgba(255,100,100,0.7)', textAlign: 'center', lineHeight: 1.6 }}>{apiError}</div>
+            </div>
+          )}
 
           {prediction && (
             <div ref={resultRef} style={{ opacity: 0 }}>
@@ -486,7 +499,6 @@ export default function PredictionDashboard() {
         </div>
       </div>
 
-      {/* ── POSTMORTEM ── */}
       <PostmortemSection />
 
       <style>{`
@@ -496,6 +508,3 @@ export default function PredictionDashboard() {
     </section>
   )
 }
-
-
-
