@@ -7,9 +7,9 @@ const DRIVERS = [
   'Max Verstappen', 'Lando Norris', 'Charles Leclerc',
   'Oscar Piastri', 'George Russell', 'Carlos Sainz',
   'Lewis Hamilton', 'Andrea Kimi Antonelli',
-  'Sergio Pérez', 'Yuki Tsunoda', 'Isack Hadjar',
+  'Sergio Pérez', 'Arvid Lindblad', 'Isack Hadjar',
   'Fernando Alonso', 'Lance Stroll',
-  'Pierre Gasly', 'Jack Doohan',
+  'Pierre Gasly', 'Franco Colapinto',
   'Oliver Bearman', 'Esteban Ocon',
   'Alexander Albon',
   'Nico Hülkenberg', 'Gabriel Bortoleto',
@@ -27,37 +27,37 @@ const TRACKS = [
 ]
 
 const DRIVER_PROFILES: Record<string, { constructor: string; gridPos: number; driverForm: number; constructorForm: number; trackHistory: number; dnfRate: number; consDNFRate: number; reliability: number }> = {
-  'Max Verstappen':          { constructor: 'Red Bull Racing', gridPos: 1,  driverForm: 0.98, constructorForm: 0.97, trackHistory: 0.95, dnfRate: 0.04, consDNFRate: 0.03, reliability: 0.99 },
-  'Lando Norris':            { constructor: 'McLaren',         gridPos: 2,  driverForm: 0.93, constructorForm: 0.91, trackHistory: 0.80, dnfRate: 0.05, consDNFRate: 0.05, reliability: 0.96 },
-  'Charles Leclerc':         { constructor: 'Ferrari',         gridPos: 3,  driverForm: 0.88, constructorForm: 0.87, trackHistory: 0.85, dnfRate: 0.08, consDNFRate: 0.07, reliability: 0.93 },
-  'Carlos Sainz':            { constructor: 'Williams',        gridPos: 4,  driverForm: 0.85, constructorForm: 0.82, trackHistory: 0.82, dnfRate: 0.06, consDNFRate: 0.07, reliability: 0.94 },
-  'Lewis Hamilton':          { constructor: 'Ferrari',         gridPos: 5,  driverForm: 0.86, constructorForm: 0.87, trackHistory: 0.90, dnfRate: 0.05, consDNFRate: 0.07, reliability: 0.95 },
-  'George Russell':          { constructor: 'Mercedes',        gridPos: 6,  driverForm: 0.83, constructorForm: 0.84, trackHistory: 0.78, dnfRate: 0.06, consDNFRate: 0.05, reliability: 0.94 },
-  'Fernando Alonso':         { constructor: 'Aston Martin',    gridPos: 7,  driverForm: 0.80, constructorForm: 0.78, trackHistory: 0.88, dnfRate: 0.07, consDNFRate: 0.08, reliability: 0.92 },
-  'Oscar Piastri':           { constructor: 'McLaren',         gridPos: 4,  driverForm: 0.87, constructorForm: 0.91, trackHistory: 0.72, dnfRate: 0.05, consDNFRate: 0.05, reliability: 0.95 },
-  'Sergio Pérez':            { constructor: 'Red Bull Racing', gridPos: 8,  driverForm: 0.75, constructorForm: 0.97, trackHistory: 0.80, dnfRate: 0.09, consDNFRate: 0.03, reliability: 0.91 },
-  'Lance Stroll':            { constructor: 'Aston Martin',    gridPos: 12, driverForm: 0.68, constructorForm: 0.78, trackHistory: 0.65, dnfRate: 0.10, consDNFRate: 0.08, reliability: 0.89 },
-  'Andrea Kimi Antonelli':   { constructor: 'Mercedes',        gridPos: 2,  driverForm: 0.97, constructorForm: 0.95, trackHistory: 0.85, dnfRate: 0.02, consDNFRate: 0.03, reliability: 0.98 },
+  'Max Verstappen':          { constructor: 'Red Bull Racing', gridPos: 5,  driverForm: 0.98, constructorForm: 0.97, trackHistory: 0.95, dnfRate: 0.04, consDNFRate: 0.03, reliability: 0.99 },
+  'Lando Norris':            { constructor: 'McLaren',         gridPos: 4,  driverForm: 0.93, constructorForm: 0.91, trackHistory: 0.80, dnfRate: 0.05, consDNFRate: 0.05, reliability: 0.96 },
+  'Charles Leclerc':         { constructor: 'Ferrari',         gridPos: 10,  driverForm: 0.88, constructorForm: 0.87, trackHistory: 0.85, dnfRate: 0.08, consDNFRate: 0.07, reliability: 0.93 },
+  'Carlos Sainz':            { constructor: 'Williams',        gridPos: 16,  driverForm: 0.85, constructorForm: 0.82, trackHistory: 0.82, dnfRate: 0.06, consDNFRate: 0.07, reliability: 0.94 },
+  'Lewis Hamilton':          { constructor: 'Ferrari',         gridPos: 2,  driverForm: 0.86, constructorForm: 0.87, trackHistory: 0.90, dnfRate: 0.05, consDNFRate: 0.07, reliability: 0.95 },
+  'George Russell':          { constructor: 'Mercedes',        gridPos: 1,  driverForm: 0.83, constructorForm: 0.84, trackHistory: 0.78, dnfRate: 0.06, consDNFRate: 0.05, reliability: 0.94 },
+  'Fernando Alonso':         { constructor: 'Aston Martin',    gridPos: 22,  driverForm: 0.80, constructorForm: 0.78, trackHistory: 0.88, dnfRate: 0.07, consDNFRate: 0.08, reliability: 0.92 },
+  'Oscar Piastri':           { constructor: 'McLaren',         gridPos: 7,  driverForm: 0.87, constructorForm: 0.91, trackHistory: 0.72, dnfRate: 0.05, consDNFRate: 0.05, reliability: 0.95 },
+  'Sergio Pérez':            { constructor: 'Cadillac', gridPos: 19,  driverForm: 0.75, constructorForm: 0.97, trackHistory: 0.80, dnfRate: 0.09, consDNFRate: 0.03, reliability: 0.91 },
+  'Lance Stroll':            { constructor: 'Aston Martin',    gridPos: 21, driverForm: 0.68, constructorForm: 0.78, trackHistory: 0.65, dnfRate: 0.10, consDNFRate: 0.08, reliability: 0.89 },
+  'Andrea Kimi Antonelli':   { constructor: 'Mercedes',        gridPos: 3,  driverForm: 0.99, constructorForm: 0.95, trackHistory: 0.85, dnfRate: 0.02, consDNFRate: 0.03, reliability: 0.98 },
   'Isack Hadjar':            { constructor: 'Racing Bulls',    gridPos: 6,  driverForm: 0.72, constructorForm: 0.70, trackHistory: 0.50, dnfRate: 0.06, consDNFRate: 0.06, reliability: 0.93 },
-  'Yuki Tsunoda':            { constructor: 'Red Bull Racing', gridPos: 9,  driverForm: 0.70, constructorForm: 0.80, trackHistory: 0.65, dnfRate: 0.08, consDNFRate: 0.05, reliability: 0.91 },
-  'Pierre Gasly':            { constructor: 'Alpine F1 Team',  gridPos: 10, driverForm: 0.68, constructorForm: 0.65, trackHistory: 0.60, dnfRate: 0.08, consDNFRate: 0.09, reliability: 0.90 },
-  'Jack Doohan':             { constructor: 'Alpine F1 Team',  gridPos: 14, driverForm: 0.60, constructorForm: 0.65, trackHistory: 0.45, dnfRate: 0.09, consDNFRate: 0.09, reliability: 0.89 },
-  'Oliver Bearman':          { constructor: 'Haas F1 Team',    gridPos: 11, driverForm: 0.72, constructorForm: 0.68, trackHistory: 0.50, dnfRate: 0.07, consDNFRate: 0.08, reliability: 0.91 },
-  'Esteban Ocon':            { constructor: 'Haas F1 Team',    gridPos: 13, driverForm: 0.65, constructorForm: 0.68, trackHistory: 0.60, dnfRate: 0.08, consDNFRate: 0.08, reliability: 0.90 },
-  'Alexander Albon':         { constructor: 'Williams',        gridPos: 12, driverForm: 0.68, constructorForm: 0.72, trackHistory: 0.55, dnfRate: 0.07, consDNFRate: 0.07, reliability: 0.91 },
-  'Nico Hülkenberg':         { constructor: 'Sauber',          gridPos: 15, driverForm: 0.62, constructorForm: 0.58, trackHistory: 0.55, dnfRate: 0.08, consDNFRate: 0.10, reliability: 0.89 },
-  'Gabriel Bortoleto':       { constructor: 'Sauber',          gridPos: 16, driverForm: 0.60, constructorForm: 0.58, trackHistory: 0.45, dnfRate: 0.09, consDNFRate: 0.10, reliability: 0.88 },
-  'Liam Lawson':             { constructor: 'Racing Bulls',    gridPos: 14, driverForm: 0.65, constructorForm: 0.70, trackHistory: 0.50, dnfRate: 0.07, consDNFRate: 0.06, reliability: 0.91 },
+  'Arvid Lindblad':          { constructor: 'Racing Bulls',    gridPos: 11, driverForm: 0.65, constructorForm: 0.70, trackHistory: 0.40, dnfRate: 0.08, consDNFRate: 0.06, reliability: 0.90 },
+  'Pierre Gasly':            { constructor: 'Alpine F1 Team',  gridPos: 14, driverForm: 0.68, constructorForm: 0.65, trackHistory: 0.60, dnfRate: 0.08, consDNFRate: 0.09, reliability: 0.90 },
+  'Franco Colapinto':             { constructor: 'Alpine F1 Team',  gridPos: 13, driverForm: 0.60, constructorForm: 0.65, trackHistory: 0.45, dnfRate: 0.09, consDNFRate: 0.09, reliability: 0.89 },
+  'Oliver Bearman':          { constructor: 'Haas F1 Team',    gridPos: 15, driverForm: 0.72, constructorForm: 0.68, trackHistory: 0.50, dnfRate: 0.07, consDNFRate: 0.08, reliability: 0.91 },
+  'Esteban Ocon':            { constructor: 'Haas F1 Team',    gridPos: 17, driverForm: 0.65, constructorForm: 0.68, trackHistory: 0.60, dnfRate: 0.08, consDNFRate: 0.08, reliability: 0.90 },
+  'Alexander Albon':         { constructor: 'Williams',        gridPos: 18, driverForm: 0.68, constructorForm: 0.72, trackHistory: 0.55, dnfRate: 0.07, consDNFRate: 0.07, reliability: 0.91 },
+  'Nico Hülkenberg':          { constructor: 'Audi',          gridPos: 9, driverForm: 0.62, constructorForm: 0.58, trackHistory: 0.55, dnfRate: 0.08, consDNFRate: 0.10, reliability: 0.89 },
+  'Gabriel Bortoleto':       { constructor: 'Audi',          gridPos: 12, driverForm: 0.60, constructorForm: 0.58, trackHistory: 0.45, dnfRate: 0.09, consDNFRate: 0.10, reliability: 0.88 },
+  'Liam Lawson':             { constructor: 'Racing Bulls',    gridPos: 8, driverForm: 0.65, constructorForm: 0.70, trackHistory: 0.50, dnfRate: 0.07, consDNFRate: 0.06, reliability: 0.91 },
 }
 
-// ── Postmortem Data ──────────────────────────────────────────────────────────
+// ── Postmortem Data ───────────────────────────────────────────────────────
 const POSTMORTEMS = {
   canada: {
     label: 'CANADA 2026',
     mae: 4.76,
     mae_excl_dnf: 3.1,
     best: 'Max Verstappen — Δ0.2 positions',
-    miss: 'George Russell — DNF from pole (mechanical, unpredictable)',
+    miss: 'George Russell â€” DNF from pole (mechanical, unpredictable)',
     note: 'DNF excluded from adjusted MAE. Mechanical failures are not predictable from qualifying or form data.',
     results: [
       { driver: 'Kimi Antonelli',   team: 'Mercedes',  predicted: 5.5, actual: 1,  grid: 2 },
@@ -103,7 +103,7 @@ type FormState = {
   constructorForm: string
 }
 
-// ── Postmortem Component ─────────────────────────────────────────────────────
+// ── Postmortem Component ─────────────────────────────────────────────────
 function PostmortemSection() {
   const [active, setActive] = useState<'monaco' | 'canada'>('monaco')
   const data = POSTMORTEMS[active]
@@ -255,7 +255,7 @@ function PostmortemSection() {
   )
 }
 
-// ── Main Dashboard ───────────────────────────────────────────────────────────
+// ── Main Dashboard ────────────────────────────────────────────────────────
 export default function PredictionDashboard() {
   const [form, setForm] = useState<FormState>({
     driver: '', track: '', qualiPos: '1', gridPos: '1',
@@ -465,9 +465,9 @@ export default function PredictionDashboard() {
 
               <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
                 {[
-                  { pos: '1ST', val: prediction?.win_probability ?? 0 },
-                  { pos: '2ND', val: prediction?.podium_probability ?? 0 },
-                  { pos: '3RD', val: Math.round((prediction?.podium_probability ?? 0) * 1.3) },
+                  { pos: 'WIN CHANCE',    val: prediction?.win_probability ?? 0 },
+                  { pos: 'PODIUM CHANCE', val: prediction?.podium_probability ?? 0 },
+                  { pos: 'POINTS FINISH', val: prediction?.predicted_position ? Math.round(Math.max(0, (11 - prediction.predicted_position) / 10 * 100)) : 0 },
                 ].map(({ pos, val }, i) => (
                   <div key={i} style={{
                     flex: 1, padding: '10px 12px', textAlign: 'center',
@@ -496,3 +496,6 @@ export default function PredictionDashboard() {
     </section>
   )
 }
+
+
+

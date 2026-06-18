@@ -85,7 +85,7 @@ export default function Home() {
             ].map(item => (
               <a key={item.label} href={item.disabled ? undefined : item.href} style={{
                 fontFamily: 'Orbitron, monospace', fontSize: 9, letterSpacing: 3,
-                color: item.disabled ? 'rgba(255,120,50,0.25)' : 'rgba(255,120,50,0.6)',
+                color: item.disabled ? 'rgba(255,120,50,0.6)' : 'rgba(255,120,50,0.9)',
                 background: 'none', border: 'none',
                 cursor: item.disabled ? 'not-allowed' : 'pointer',
                 textTransform: 'uppercase' as const,
@@ -94,7 +94,7 @@ export default function Home() {
               }}>
                 {item.label}
                 {item.disabled && (
-                  <span style={{ fontSize: 7, marginLeft: 4, color: 'rgba(255,69,0,0.3)' }}>SOON</span>
+                  <span style={{ fontSize: 7, marginLeft: 4, color: 'rgba(255,69,0,0.8)' }}>SOON</span>
                 )}
               </a>
             ))}
@@ -117,7 +117,7 @@ export default function Home() {
           padding: '24px 6vw',
           display: 'flex', justifyContent: 'space-between',
         }}>
-          <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 9, letterSpacing: 3, color: 'rgba(255,69,0,0.3)' }}>PITWALL © 2025</div>
+          <div style={{ fontFamily: 'Orbitron, monospace', fontSize: 9, letterSpacing: 3, color: 'rgba(255,69,0,0.8)' }}>PITWALL © 2025</div>
           <div style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 12, letterSpacing: 2, color: 'rgba(255,120,50,0.3)' }}>XGBOOST · MULTI-SEASON · LEAKAGE-SAFE</div>
         </footer>
       </div>

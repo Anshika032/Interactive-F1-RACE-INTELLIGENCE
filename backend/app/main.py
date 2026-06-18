@@ -34,7 +34,7 @@ DRIVER_ALIASES = {
     "andrea kimi antonelli": "Kimi Antonelli",
     "bearman":       "Oliver Bearman",
     "hadjar":        "Isack Hadjar",
-    "doohan":        "Jack Doohan",
+    "colapinto":     "Franco Colapinto",
     "bortoleto":     "Gabriel Bortoleto",
     "tsunoda":       "Yuki Tsunoda",
     "gasly":         "Pierre Gasly",
@@ -45,30 +45,30 @@ DRIVER_ALIASES = {
     "colapinto":     "Franco Colapinto",
 }
 
-# Approximate 2026 championship standings after Canada
+# Approximate 2026 championship standings after Monaco
 CHAMPIONSHIP_POINTS_2025 = {
-    "Kimi Antonelli":      127,
-    "George Russell":       98,
-    "Lando Norris":         87,
-    "Oscar Piastri":        75,
-    "Charles Leclerc":      72,
-    "Max Verstappen":       65,
-    "Lewis Hamilton":       58,
+    "Kimi Antonelli":      152,  # +25 Monaco win
+    "George Russell":       98,  # P12, no points
+    "Lando Norris":         87,  # DNF, no points
+    "Oscar Piastri":        87,  # +12 P4
+    "Charles Leclerc":      72,  # DNF, no points
+    "Max Verstappen":       65,  # DNF, no points
+    "Lewis Hamilton":      116,  # +18 P2
     "Oliver Bearman":       32,
-    "Isack Hadjar":         28,
-    "Pierre Gasly":         24,
+    "Isack Hadjar":         43,  # +15 P3
+    "Pierre Gasly":         31,  # +7 P7
     "Franco Colapinto":     18,
-    "Liam Lawson":          16,
+    "Liam Lawson":          28,  # +10 P5
     "Carlos Sainz":         14,
     "Gabriel Bortoleto":    10,
     "Nico HÃ¼lkenberg":       8,
-    "Alexander Albon":       6,
-    "Esteban Ocon":          4,
-    "Fernando Alonso":       2,
+    "Alexander Albon":      10,  # +4 P8
+    "Esteban Ocon":          6,  # +2 P9
+    "Fernando Alonso":       3,  # +1 P10
     "Lance Stroll":          0,
     "Sergio PÃ©rez":          0,
+    "Arvid Lindblad":        8,  # +8 P6
     "Valtteri Bottas":       0,
-    "Arvid Lindblad":        0,
 }
 
 CIRCUIT_RAIN_PROB = {
@@ -130,16 +130,21 @@ def get_live_rain_prob(circuit_name: str) -> float:
         return CIRCUIT_RAIN_PROB.get(circuit_name, 0.2)
     try:
         import requests
+        from datetime import datetime
 
         lat, lon = coords
         url = (
             f"https://api.open-meteo.com/v1/forecast"
             f"?latitude={lat}&longitude={lon}"
             f"&daily=precipitation_probability_max"
-            f"&forecast_days=1"
+            f"&forecast_days=16"
         )
         r = requests.get(url, timeout=5)
-        prob = r.json()['daily']['precipitation_probability_max'][0]
+        daily = r.json()['daily']
+        today = datetime.utcnow().date()
+        # find the index closest to race day, fallback to day 4
+        idx = min(4, len(daily['precipitation_probability_max']) - 1)
+        prob = daily['precipitation_probability_max'][idx]
         result = round(prob / 100, 3)
         print(f"[WEATHER] {circuit_name}: {result} (live)")
         return result
@@ -163,7 +168,7 @@ DRIVER_TEAM_2025 = {
     "Fernando Alonso":         "Aston Martin",
     "Lance Stroll":            "Aston Martin",
     "Pierre Gasly":            "Alpine F1 Team",
-    "Jack Doohan":             "Alpine F1 Team",
+    "Franco Colapinto":        "Alpine F1 Team",
     "Oliver Bearman":          "Haas F1 Team",
     "Esteban Ocon":            "Haas F1 Team",
     "Alexander Albon":         "Williams",
@@ -230,7 +235,11 @@ def get_driver_session_data(driver_name: str, track_name: str, year: int = 2026,
         for try_year in [year, 2024]:
             try:
                 s = fastf1.get_event_schedule(try_year)
-                ev = s[s['EventName'].str.contains(track_name, case=False, na=False)]
+                TRACK_NAME_ALIASES = {
+                    'Spanish Grand Prix': 'Barcelona',
+                }
+                search_name = TRACK_NAME_ALIASES.get(track_name, track_name)
+                ev = s[s['EventName'].str.contains(search_name, case=False, na=False)]
                 if not ev.empty:
                     schedule = s
                     actual_year = try_year
@@ -295,7 +304,9 @@ def get_driver_session_data(driver_name: str, track_name: str, year: int = 2026,
             real_team = fallback_team
             print(f"[INFO] Using fallback team for {driver_name}: {real_team}")
 
-        recent_rounds = list(range(max(1, target_round - 5), target_round))
+        COMPLETED_ROUNDS_2026 = 7
+        effective_round = min(target_round, COMPLETED_ROUNDS_2026)
+        recent_rounds = list(range(max(1, effective_round - 5), effective_round))
         for rnd in recent_rounds:
             try:
                 r = fastf1.get_session(actual_year, rnd, 'R')
@@ -353,7 +364,7 @@ def get_driver_session_data(driver_name: str, track_name: str, year: int = 2026,
             "Isack Hadjar":          2026,
             "Oliver Bearman":        2026,
             "Gabriel Bortoleto":     2026,
-            "Jack Doohan":           2026,
+            "Franco Colapinto":      2026,
             "Liam Lawson":           2024,
             "Franco Colapinto":      2024,
         }
@@ -651,6 +662,7 @@ def predict(request: PredictionRequest):
         "QualiDeltaToPole":        real_quali_delta,
         "SprintGapPerLap":         0.0,
         "GridPosition":            real_grid,
+        "QualiPosition":          real_grid,  
         "Round":                   request.Round or 10,
         "BestPracticeLapSeconds":  request.BestPracticeLapSeconds or 72.5,
         "PracticePosition":        real_grid,
@@ -659,7 +671,7 @@ def predict(request: PredictionRequest):
         "DriverForm":              real_driver_form,
         "ConstructorForm":         real_constructor_form,
         "TrackHistory":            real_track_history,
-        "GainPotential":           round(max(0.1, 1.0 - real_driver_form), 3),
+        "GainPotential":           round(max(0.1, real_driver_form * (1.0 - (real_grid - 1) / 20.0)), 3),
         "DriverDNFRate":           real_driver_dnf,
         "ConstructorDNFRate":      real_cons_dnf,
         "ReliabilityScore":        round(1 - (real_driver_dnf + real_cons_dnf) / 2, 3),
@@ -673,6 +685,14 @@ def predict(request: PredictionRequest):
     print(features)
     print(f"[FEATURES] Driver={request.Driver}, Track={request.RaceName}, Grid={real_grid}, Team={real_team}")
 
+    FEATURE_COLS = [
+        "Round", "GridPosition", "QualiPosition", "QualiDeltaToPole",
+        "BestPracticeLapSeconds", "PracticePosition", "PracticeDeltaToFastest",
+        "DriverForm", "ConstructorForm", "TrackHistory", "GainPotential",
+        "DriverDNFRate", "ConstructorDNFRate", "ReliabilityScore",
+        "DriverEncoded", "ConstructorEncoded", "TrackEncoded"
+    ]
+    features = features[FEATURE_COLS]
 
     try:
         prediction = model.predict(features)[0]
@@ -818,3 +838,8 @@ def monaco_postmortem():
         "worst_prediction": "George Russell (error: 8.0 — underperformed vs quali pace)",
         "notes": "Verstappen and Leclerc retired. Excluding DNFs: MAE = 2.8. Top-3 predicted within 1 position."
     }
+
+
+
+
+
